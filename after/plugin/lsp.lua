@@ -1,5 +1,12 @@
 local lsp_zero = require('lsp-zero')
 
+vim.diagnostic.config({
+  virtual_text = true,   -- show errors inline (like Primeagen)
+  signs = true,          -- icons in the sign column
+  underline = true,      -- underline issues
+  update_in_insert = false,
+  severity_sort = true,
+})
 -- Setup on_attach for LSP keymaps
 lsp_zero.on_attach(function(_, bufnr)
   local opts = {buffer = bufnr}
