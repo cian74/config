@@ -1,5 +1,6 @@
 local lsp_zero = require('lsp-zero')
 
+
 vim.diagnostic.config({
   virtual_text = true,   -- show errors inline (like Primeagen)
   signs = true,          -- icons in the sign column
