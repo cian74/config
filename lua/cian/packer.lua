@@ -13,6 +13,11 @@ return require('packer').startup(function(use)
 		requires = { {'nvim-lua/plenary.nvim'} }
 	}
 
+	use {
+		'mfussenegger/nvim-jdtls',
+		ft = 'java',
+	}
+
 	use({
 		'rose-pine/neovim',
 		as = 'rose-pine',
