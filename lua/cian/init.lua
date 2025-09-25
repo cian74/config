@@ -1,4 +1,3 @@
+require("cian.lazy")
 require("cian.remap")
-print("hello from cian")
-
-
+require("cian.set")
