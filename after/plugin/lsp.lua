@@ -20,10 +20,42 @@ end)
 require('mason').setup()
 
 require('mason-lspconfig').setup({
-  ensure_installed = { "ts_ls", "clangd", "pyright","java_language_server" },
+  ensure_installed = { "ts_ls", "clangd", "pyright", "lua_ls" },
   handlers = {
     lsp_zero.default_setup,
+    -- Custom handler for lua_ls
+    lua_ls = function()
+      require('lspconfig').lua_ls.setup({
+        settings = {
+          Lua = {
+            runtime = {
+              version = 'LuaJIT'
+            },
+            diagnostics = {
+              globals = { 'vim' },
+            },
+            workspace = {
+              library = vim.api.nvim_get_runtime_file("", true),
+			  checkThirdParty = false
+            }
+          }
+        }
+      })
+    end,
   },
+})
+
+-- fixes undefined global warning
+vim.lsp.config("lua_ls", {
+	settings = {
+		Lua = {
+			diagnostics = {
+				globals = {
+					"vim"
+				}
+			}
+		}
+	}
 })
 
 -- nvim-cmp setup
@@ -31,6 +63,11 @@ local cmp = require('cmp')
 local cmp_action = lsp_zero.cmp_action()
 
 cmp.setup({
+  snippet = {
+	  expand = function(args)
+      require('luasnip').lsp_expand(args.body)
+    end,
+  },
   mapping = cmp.mapping.preset.insert({
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-Enter>'] = cmp.mapping.confirm({ select = true }),
@@ -45,3 +82,9 @@ cmp.setup({
   },
 })
 
+vim.api.nvim_create_autocmd('FileType', {
+	pattern = 'java',
+	callback = function(args)
+		require 'jdtls.jdtls_setup'.setup()
+	end
+})
