@@ -1,4 +1,4 @@
-local lsp_zero = require('lsp-zero')
+require('mason').setup()
 
 -- Diagnostics
 vim.diagnostic.config({
@@ -10,69 +10,77 @@ vim.diagnostic.config({
 })
 
 -- Global LSP keymaps
-lsp_zero.on_attach(function(_, bufnr)
-  local opts = { buffer = bufnr }
-  vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-  vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-end)
-
--- Mason + mason-lspconfig
-require('mason').setup()
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(args)
+    local opts = { buffer = args.buf }
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+    vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+  end,
+})
 
 require('mason-lspconfig').setup({
-  ensure_installed = { "ts_ls", "clangd", "pyright", "lua_ls" },
-  handlers = {
-    lsp_zero.default_setup,
-    -- Custom handler for lua_ls
-    lua_ls = function()
-      require('lspconfig').lua_ls.setup({
-        settings = {
-          Lua = {
-            runtime = {
-              version = 'LuaJIT'
-            },
-            diagnostics = {
-              globals = { 'vim' },
-            },
-            workspace = {
-              library = vim.api.nvim_get_runtime_file("", true),
-			  checkThirdParty = false
-            }
-          }
-        }
-      })
-    end,
-  },
+  ensure_installed = { "clangd", "lua_ls" },
 })
 
--- fixes undefined global warning
-vim.lsp.config("lua_ls", {
-	settings = {
-		Lua = {
-			diagnostics = {
-				globals = {
-					"vim"
-				}
-			}
-		}
-	}
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+vim.lsp.config('clangd', {
+  capabilities = capabilities,
 })
+
+vim.lsp.config('lua_ls', {
+  capabilities = capabilities,
+  settings = {
+    Lua = {
+      runtime = { version = 'LuaJIT' },
+      diagnostics = { globals = { 'vim' } },
+      workspace = {
+        library = vim.api.nvim_get_runtime_file("", true),
+        checkThirdParty = false
+      },
+      telemetry = { enable = false },
+    }
+  }
+})
+
+-- Enable the configured servers
+vim.lsp.enable('clangd')
+vim.lsp.enable('lua_ls')
 
 -- nvim-cmp setup
 local cmp = require('cmp')
-local cmp_action = lsp_zero.cmp_action()
+local luasnip = require('luasnip')
 
 cmp.setup({
   snippet = {
-	  expand = function(args)
-      require('luasnip').lsp_expand(args.body)
+    expand = function(args)
+      luasnip.lsp_expand(args.body)
     end,
   },
   mapping = cmp.mapping.preset.insert({
     ['<C-Space>'] = cmp.mapping.complete(),
-    ['<C-Enter>'] = cmp.mapping.confirm({ select = true }),
-    ['<Tab>'] = cmp_action.tab_complete(),
-    ['<S-Tab>'] = cmp_action.select_prev_or_fallback(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+    ['<Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
+    ['<S-Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
   }),
   sources = {
     { name = 'nvim_lsp' },
@@ -82,9 +90,10 @@ cmp.setup({
   },
 })
 
+-- Java JDTLS
 vim.api.nvim_create_autocmd('FileType', {
-	pattern = 'java',
-	callback = function(args)
-		require 'jdtls.jdtls_setup'.setup()
-	end
+  pattern = 'java',
+  callback = function()
+    require('jdtls.jdtls_setup').setup()
+  end
 })

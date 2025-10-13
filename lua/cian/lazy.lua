@@ -20,7 +20,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	end
 end
 vim.opt.rtp:prepend(lazypath)
-
 vim.g.mapleader = " "
 
 -- plugin list
@@ -30,11 +29,9 @@ local plugins = {
 		version = "0.1.8",
 		dependencies = { "nvim-lua/plenary.nvim" },
 	},
-
 	{
 		"mfussenegger/nvim-jdtls"
 	},
-
 	{
 		"rose-pine/neovim",
 		name = "rose-pine",
@@ -42,51 +39,59 @@ local plugins = {
 			vim.cmd("colorscheme rose-pine")
 		end,
 	},
-
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 	},
-
 	{ "nvim-treesitter/playground" },
 	{ "mbbill/undotree" },
 	{ "theprimeagen/harpoon" },
-
+	
+	-- REPLACE lsp-zero WITH THESE:
 	{
-		"VonHeikemen/lsp-zero.nvim",
-		branch = "v3.x",
+		"williamboman/mason.nvim",
+		config = function()
+			require("mason").setup()
+		end,
+	},
+	{
+		"williamboman/mason-lspconfig.nvim",
+		dependencies = { "williamboman/mason.nvim" },
+		opts = {
+			automatic_enable = {
+				exclude = { 'jdtls' }
+			}
+		}
+	},
+	{
+		"neovim/nvim-lspconfig",
 		dependencies = {
-			"neovim/nvim-lspconfig",
 			"williamboman/mason.nvim",
-			{
-				"williamboman/mason-lspconfig.nvim",
-				opts = {
-					automatic_enable = {
-						exclude = {
-							'jdtls'
-						}
-					}
-				}
-			},
-
-			"hrsh7th/nvim-cmp",
+			"williamboman/mason-lspconfig.nvim",
+		},
+	},
+	{
+		"hrsh7th/nvim-cmp",
+		dependencies = {
+			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
-			"saadparwaiz1/cmp_luasnip",
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-nvim-lua",
-
 			"L3MON4D3/LuaSnip",
+			"saadparwaiz1/cmp_luasnip",
 			"rafamadriz/friendly-snippets",
 		},
 	},
-
+	"hrsh7th/cmp-nvim-lsp",
+	"hrsh7th/cmp-buffer",
+	"hrsh7th/cmp-path",
+	"L3MON4D3/LuaSnip",
+	"saadparwaiz1/cmp_luasnip",
+	"rafamadriz/friendly-snippets",
+	
 	{
 		"windwp/nvim-autopairs",
 		config = function()
 			require("nvim-autopairs").setup {}
-
-			-- If you're using nvim-cmp, integrate with autopairs
 			local cmp_status, cmp = pcall(require, "cmp")
 			if cmp_status then
 				local cmp_autopairs = require("nvim-autopairs.completion.cmp")
@@ -97,4 +102,3 @@ local plugins = {
 }
 
 require("lazy").setup(plugins)
-
