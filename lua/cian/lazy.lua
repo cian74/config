@@ -25,6 +25,19 @@ vim.g.mapleader = " "
 -- plugin list
 local plugins = {
 	{
+  "MunifTanjim/nui.nvim"
+	},
+	{
+		dir = "/home/cian/Work/java-refactor-tool/nvim-plugin",  -- absolute path to your local plugin
+		name = "refactor",                    -- name used internally by lazy
+		dev = true,                           -- marks it as a local/dev plugin
+		lazy = false,                         -- load it immediately (optional)
+		config = function()
+			-- optional: start backend automatically on startup
+			-- require("refactor").start_backend()
+		end,
+	},
+	{
 		"nvim-telescope/telescope.nvim",
 		version = "0.1.8",
 		dependencies = { "nvim-lua/plenary.nvim" },
@@ -46,7 +59,7 @@ local plugins = {
 	{ "nvim-treesitter/playground" },
 	{ "mbbill/undotree" },
 	{ "theprimeagen/harpoon" },
-	
+
 	-- REPLACE lsp-zero WITH THESE:
 	{
 		"williamboman/mason.nvim",
@@ -87,7 +100,7 @@ local plugins = {
 	"L3MON4D3/LuaSnip",
 	"saadparwaiz1/cmp_luasnip",
 	"rafamadriz/friendly-snippets",
-	
+
 	{
 		"windwp/nvim-autopairs",
 		config = function()
