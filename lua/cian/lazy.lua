@@ -25,12 +25,10 @@ vim.g.mapleader = " "
 -- plugin list
 local plugins = {
 	{
-  "MunifTanjim/nui.nvim"
+		"MunifTanjim/nui.nvim"
 	},
 	{
-		dir = "/home/cian/Work/java-refactor-tool/nvim-plugin",  -- absolute path to your local plugin
-		name = "refactor",                    -- name used internally by lazy
-		dev = true,                           -- marks it as a local/dev plugin
+		"cian74/java-refactor.nvim",  -- absolute path to your local plugin
 		lazy = false,                         -- load it immediately (optional)
 		config = function()
 			-- optional: start backend automatically on startup
