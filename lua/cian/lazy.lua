@@ -28,14 +28,13 @@ local plugins = {
 		"MunifTanjim/nui.nvim"
 	},
 	{
-		"cian74/java-refactor.nvim",  -- absolute path to your local plugin
-		lazy = false,                         -- load it immediately (optional)
+		"cian74/java-refactor.nvim",  -- or whatever your GitHub repo is
+		lazy = false,
+		dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim" },
 		config = function()
-			-- optional: start backend automatically on startup
-			-- require("refactor").start_backend()
+			require("refactor")
 		end,
-	},
-	{
+	},	{
 		"nvim-telescope/telescope.nvim",
 		version = "0.1.8",
 		dependencies = { "nvim-lua/plenary.nvim" },
